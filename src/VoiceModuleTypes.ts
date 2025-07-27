@@ -11,6 +11,7 @@ export type VoiceModule = {
   destroySpeech: (callback: Callback) => void;
   destroyTranscription: (callback: Callback) => void;
   startSpeech: Function;
+  startSpeechWithExtras: Function;
   startTranscription: Function;
   stopSpeech: (callback: Callback) => void;
   stopTranscription: (callback: Callback) => void;
@@ -30,6 +31,7 @@ export type SpeechEvents = {
   onSpeechResults?: (e: SpeechResultsEvent) => void;
   onSpeechPartialResults?: (e: SpeechResultsEvent) => void;
   onSpeechVolumeChanged?: (e: SpeechVolumeChangeEvent) => void;
+  onSpeechSegmentResults?: (e: SpeechResultsEvent) => void;
 };
 
 export type TranscriptionEvents = {

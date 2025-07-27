@@ -120,6 +120,23 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
           intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, extras.intValue());
           break;
         }
+        default: {
+          // Handle any other custom extras that come from JS
+          // This allows us to pass Android-specific constants like android.speech.extra.SEGMENTED_SESSION
+          switch (opts.getType(key)) {
+            case Boolean:
+              intent.putExtra(key, opts.getBoolean(key));
+              break;
+            case String:
+              intent.putExtra(key, opts.getString(key));
+              break;
+            case Number:
+              Double numValue = opts.getDouble(key);
+              intent.putExtra(key, numValue.intValue());
+              break;
+          }
+          break;
+        }
       }
     }
 
@@ -152,6 +169,30 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
 
   @ReactMethod
   public void startSpeech(final String locale, final ReadableMap opts, final Callback callback) {
+    if (!isPermissionGranted() && opts.getBoolean("REQUEST_PERMISSIONS_AUTO")) {
+      String[] PERMISSIONS = {Manifest.permission.RECORD_AUDIO};
+      if (this.getCurrentActivity() != null) {
+        ((PermissionAwareActivity) this.getCurrentActivity()).requestPermissions(PERMISSIONS, 1, new PermissionListener() {
+          public boolean onRequestPermissionsResult(final int requestCode,
+                                                    @NonNull final String[] permissions,
+                                                    @NonNull final int[] grantResults) {
+            boolean permissionsGranted = true;
+            for (int i = 0; i < permissions.length; i++) {
+              final boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+              permissionsGranted = permissionsGranted && granted;
+            }
+            startSpeechWithPermissions(locale, opts, callback);
+            return permissionsGranted;
+          }
+        });
+      }
+      return;
+    }
+    startSpeechWithPermissions(locale, opts, callback);
+  }
+
+  @ReactMethod
+  public void startSpeechWithExtras(final String locale, final ReadableMap opts, final Callback callback) {
     if (!isPermissionGranted() && opts.getBoolean("REQUEST_PERMISSIONS_AUTO")) {
       String[] PERMISSIONS = {Manifest.permission.RECORD_AUDIO};
       if (this.getCurrentActivity() != null) {
@@ -381,6 +422,24 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
     WritableMap event = Arguments.createMap();
     event.putDouble("value", (double) rmsdB);
     sendEvent("onSpeechVolumeChanged", event);
+  }
+
+  // Handle segmented results for Android 13+ (API 33+)
+  // This method is called when using EXTRA_SEGMENTED_SESSION
+  public void onSegmentResults(Bundle segmentResults) {
+    WritableArray arr = Arguments.createArray();
+
+    ArrayList<String> matches = segmentResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+    if (matches != null) {
+      for (String result : matches) {
+        arr.pushString(result);
+      }
+    }
+
+    WritableMap event = Arguments.createMap();
+    event.putArray("value", arr);
+    sendEvent("onSpeechSegmentResults", event);
+    Log.d("ASR", "onSegmentResults()");
   }
 
   public static String getErrorText(int errorCode) {

@@ -1,10 +1,10 @@
 {
-  "name": "@wdragon/react-native-voice",
-  "description": "React Native Native Voice library for iOS and Android, folk from @react-native-voice/voice",
-  "version": "3.3.11",
-  "author": "wdragon <wdragon521@gmail.com>",
+  "name": "@cscarnell/react-native-voice-segmented",
+  "description": "React Native Voice library with Android segmented session support, forked from @wdragon/react-native-voice",
+  "version": "3.3.12",
+  "author": "CSCarnell <christopher.s.carnell@gmail.com>",
   "private": false,
-  "homepage": "https://github.com/wdragon/react-native-voice",
+  "homepage": "https://github.com/CSCarnell/react-native-voice-segmented",
   "devDependencies": {
     "@react-native-community/eslint-config": "^0.0.7",
     "@semantic-release/git": "^9.0.0",
@@ -24,14 +24,17 @@
     "ios",
     "react-native",
     "speech",
-    "voice"
+    "voice",
+    "segmented",
+    "segmented-session",
+    "speech-recognition"
   ],
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git://github.com/wdragon/react-native-voice.git"
+    "url": "git://github.com/CSCarnell/react-native-voice-segmented.git"
   },
   "scripts": {
     "lint": "eslint src/*",

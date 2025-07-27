@@ -40,6 +40,7 @@ class RCTVoice {
       onSpeechResults: () => {},
       onSpeechPartialResults: () => {},
       onSpeechVolumeChanged: () => {},
+      onSpeechSegmentResults: () => {},
       onTranscriptionStart: () => {},
       onTranscriptionEnd: () => {},
       onTranscriptionError: () => {},
@@ -55,6 +56,7 @@ class RCTVoice {
     Voice.onSpeechResults = undefined;
     Voice.onSpeechPartialResults = undefined;
     Voice.onSpeechVolumeChanged = undefined;
+    Voice.onSpeechSegmentResults = undefined;
     Voice.onTranscriptionStart = undefined;
     Voice.onTranscriptionEnd = undefined;
     Voice.onTranscriptionError = undefined;
@@ -128,6 +130,41 @@ class RCTVoice {
           callback,
         );
       } else {
+        Voice.startSpeech(locale, callback);
+      }
+    });
+  }
+
+  startWithExtras(locale: any, extras: any = {}, options = {}) {
+    if (!this._loaded && !this._listeners && voiceEmitter !== null) {
+      this._listeners = (Object.keys(this._events) as SpeechEvent[]).map(
+        (key: SpeechEvent) => voiceEmitter.addListener(key, this._events[key]),
+      );
+    }
+
+    return new Promise<void|Error>((resolve, reject) => {
+      const callback = (error: string) => {
+        if (error) {
+          reject(new Error(error));
+        } else {
+          resolve();
+        }
+      };
+      if (Platform.OS === 'android') {
+        // Merge default options with custom extras
+        const combinedOptions = Object.assign(
+          {
+            EXTRA_LANGUAGE_MODEL: 'LANGUAGE_MODEL_FREE_FORM',
+            EXTRA_MAX_RESULTS: 5,
+            EXTRA_PARTIAL_RESULTS: true,
+            REQUEST_PERMISSIONS_AUTO: true,
+          },
+          options,
+          extras, // extras take precedence
+        );
+        Voice.startSpeechWithExtras(locale, combinedOptions, callback);
+      } else {
+        // iOS fallback - just call regular start
         Voice.startSpeech(locale, callback);
       }
     });
@@ -297,6 +334,10 @@ class RCTVoice {
   }
   set onSpeechVolumeChanged(fn: (e: SpeechVolumeChangeEvent) => void) {
     this._events.onSpeechVolumeChanged = fn;
+  }
+
+  set onSpeechSegmentResults(fn: (e: SpeechResultsEvent) => void) {
+    this._events.onSpeechSegmentResults = fn;
   }
 }
 

@@ -653,6 +653,14 @@ RCT_EXPORT_METHOD(startTranscription
   callback(@[ @false ]);
 }
 
+RCT_EXPORT_METHOD(startSpeechWithExtras
+                  : (NSString *)localeStr opts:(NSDictionary *)opts callback
+                  : (RCTResponseSenderBlock)callback) {
+  // iOS no-op implementation - just call regular startSpeech
+  // Segmented session is an Android-only feature
+  [self startSpeech:localeStr callback:callback];
+}
+
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
 }

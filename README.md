@@ -1,12 +1,27 @@
-<h1 align="center">React Native Voice</h1>
-<p align="center">A speech-to-text library for <a href="https://reactnative.dev/">React Native.</a></p>. Folk from @react-native-voice/voice with a few improvements on usability.
+# React Native Voice Segmented
+
+A speech-to-text library for React Native with **Android segmented session support**.
+
+Forked from [@wdragon/react-native-voice](https://github.com/wdragon/react-native-voice) with additional features for advanced Android speech recognition capabilities.
+
+## 🆕 New Features
+
+### Segmented Session Support (Android 13+)
+
+This fork adds support for Android's segmented session feature, which allows continuous speech recognition without timing out during pauses. This is particularly useful for:
+- Long-form dictation
+- Voice notes and memos  
+- Continuous speech recognition applications
+- Multi-sentence speech input
+
+## Installation
 
 ```sh
-yarn add @wdragon/react-native-voice
+yarn add @cscarnell/react-native-voice-segmented
 
 # or
 
-npm i @wdragon/react-native-voice --save
+npm i @cscarnell/react-native-voice-segmented --save
 ```
 
 Link the iOS package
@@ -29,7 +44,7 @@ After installing this npm package, add the [config plugin](https://docs.expo.io/
 ```json
 {
   "expo": {
-    "plugins": ["@wdragon/react-native-voice"]
+    "plugins": ["@cscarnell/react-native-voice-segmented"]
   }
 }
 ```
@@ -136,4 +151,117 @@ Need to include permissions for `NSMicrophoneUsageDescription` and `NSSpeechReco
   ...
 </dict>
 ```
+
+## 🚀 Advanced Features (Segmented Session)
+
+### New Methods
+
+| Method | Description | Platform |
+|--------|-------------|----------|
+| `Voice.startWithExtras(locale, extras, options)` | Start speech recognition with custom Android intent extras | Android, iOS (no-op) |
+
+### New Events
+
+| Event | Description | Platform |
+|-------|-------------|----------|
+| `Voice.onSpeechSegmentResults` | Called when segment results are available during segmented session | Android |
+
+### Usage Examples
+
+#### Basic Segmented Session
+
+```javascript
+import Voice from '@cscarnell/react-native-voice-segmented';
+
+// Set up event handlers
+Voice.onSpeechSegmentResults = (e) => {
+  console.log('Segment results:', e.value);
+};
+
+// Start with segmented session (Android only)
+Voice.startWithExtras('en-US', {
+  'android.speech.extra.SEGMENTED_SESSION': true,
+  'android.speech.extra.PARTIAL_RESULTS': true,
+});
+```
+
+#### Advanced Configuration
+
+```javascript
+Voice.startWithExtras('en-US', {
+  // Enable segmented session (Android 13+)
+  'android.speech.extra.SEGMENTED_SESSION': true,
+  
+  // Enable partial results
+  'android.speech.extra.PARTIAL_RESULTS': true,
+  
+  // Custom timeout values
+  'android.speech.extra.SPEECH_INPUT_MINIMUM_LENGTH_MILLIS': 2000,
+  'android.speech.extra.SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS': 5000,
+  
+  // Any other Android-specific extras
+});
+```
+
+#### Continuous Dictation Example
+
+```javascript
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, ScrollView } from 'react-native';
+import Voice from '@cscarnell/react-native-voice-segmented';
+
+const ContinuousDictation = () => {
+  const [segments, setSegments] = useState([]);
+  const [isListening, setIsListening] = useState(false);
+
+  useEffect(() => {
+    Voice.onSpeechStart = () => setIsListening(true);
+    Voice.onSpeechEnd = () => setIsListening(false);
+    
+    Voice.onSpeechSegmentResults = (e) => {
+      // Each segment is a complete phrase/sentence
+      if (e.value && e.value.length > 0) {
+        setSegments(prev => [...prev, e.value[0]]);
+      }
+    };
+
+    Voice.onSpeechError = (e) => {
+      console.log('Speech error:', e.error);
+      setIsListening(false);
+    };
+
+    return () => Voice.destroy();
+  }, []);
+
+  const startContinuousListening = () => {
+    Voice.startWithExtras('en-US', {
+      'android.speech.extra.SEGMENTED_SESSION': true,
+      'android.speech.extra.PARTIAL_RESULTS': true,
+    });
+  };
+
+  return (
+    <View style={{ padding: 20 }}>
+      <Button
+        title={isListening ? 'Stop' : 'Start Continuous Dictation'}
+        onPress={isListening ? () => Voice.stop() : startContinuousListening}
+      />
+      
+      <ScrollView style={{ marginTop: 20, maxHeight: 300 }}>
+        {segments.map((segment, index) => (
+          <Text key={index} style={{ marginBottom: 10 }}>
+            {index + 1}. {segment}
+          </Text>
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
+```
+
+## Compatibility & Migration
+
+- **Android**: Segmented session requires Android 13+ (API 33+). On older versions, it gracefully falls back to standard behavior.
+- **iOS**: The `startWithExtras` method works as a no-op that calls the regular `start` method.
+- **Migration**: This library is fully backward compatible with `@wdragon/react-native-voice`. Simply replace the import and all existing functionality works exactly the same.
 
