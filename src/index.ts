@@ -41,6 +41,7 @@ class RCTVoice {
       onSpeechPartialResults: () => {},
       onSpeechVolumeChanged: () => {},
       onSpeechSegmentResults: () => {},
+      onSpeechEndOfSegmentedSession: () => {},
       onTranscriptionStart: () => {},
       onTranscriptionEnd: () => {},
       onTranscriptionError: () => {},
@@ -57,6 +58,7 @@ class RCTVoice {
     Voice.onSpeechPartialResults = undefined;
     Voice.onSpeechVolumeChanged = undefined;
     Voice.onSpeechSegmentResults = undefined;
+    Voice.onSpeechEndOfSegmentedSession = undefined;
     Voice.onTranscriptionStart = undefined;
     Voice.onTranscriptionEnd = undefined;
     Voice.onTranscriptionError = undefined;
@@ -338,6 +340,10 @@ class RCTVoice {
 
   set onSpeechSegmentResults(fn: (e: SpeechResultsEvent) => void) {
     this._events.onSpeechSegmentResults = fn;
+  }
+
+  set onSpeechEndOfSegmentedSession(fn: (e: SpeechEndEvent) => void) {
+    this._events.onSpeechEndOfSegmentedSession = fn;
   }
 }
 

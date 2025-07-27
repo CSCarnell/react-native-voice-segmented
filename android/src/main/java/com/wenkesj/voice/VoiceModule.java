@@ -442,6 +442,15 @@ public class VoiceModule extends ReactContextBaseJavaModule implements Recogniti
     Log.d("ASR", "onSegmentResults()");
   }
 
+  // Handle end of segmented session for Android 13+ (API 33+)
+  // This method is called at the end of a segmented recognition request
+  public void onEndOfSegmentedSession() {
+    WritableMap event = Arguments.createMap();
+    event.putBoolean("error", false);
+    sendEvent("onSpeechEndOfSegmentedSession", event);
+    Log.d("ASR", "onEndOfSegmentedSession()");
+  }
+
   public static String getErrorText(int errorCode) {
     String message;
     switch (errorCode) {

@@ -32,6 +32,7 @@ export type SpeechEvents = {
   onSpeechPartialResults?: (e: SpeechResultsEvent) => void;
   onSpeechVolumeChanged?: (e: SpeechVolumeChangeEvent) => void;
   onSpeechSegmentResults?: (e: SpeechResultsEvent) => void;
+  onSpeechEndOfSegmentedSession?: (e: SpeechEndEvent) => void;
 };
 
 export type TranscriptionEvents = {
