@@ -4,7 +4,7 @@ A speech-to-text library for React Native with **Android segmented session suppo
 
 Forked from [@wdragon/react-native-voice](https://github.com/wdragon/react-native-voice) with additional features for advanced Android speech recognition capabilities.
 
-## 🆕 New Features
+##  New Features
 
 ### Segmented Session Support (Android 13+)
 
@@ -152,7 +152,7 @@ Need to include permissions for `NSMicrophoneUsageDescription` and `NSSpeechReco
 </dict>
 ```
 
-## 🚀 Advanced Features (Segmented Session)
+## Advanced Features (Segmented Session)
 
 ### New Methods
 
