@@ -17,11 +17,11 @@ This fork adds support for Android's segmented session feature, which allows con
 ## Installation
 
 ```sh
-yarn add @cscarnell/react-native-voice-segmented
+yarn add https://github.com/CSCarnell/react-native-voice-segmented.git
 
 # or
 
-npm i @cscarnell/react-native-voice-segmented --save
+npm install https://github.com/CSCarnell/react-native-voice-segmented.git
 ```
 
 Link the iOS package
